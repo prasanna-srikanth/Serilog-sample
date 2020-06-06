@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Sinks.Elasticsearch;
 
 namespace SampleSerilogApi
 {
@@ -13,7 +14,12 @@ namespace SampleSerilogApi
 		{
 			Log.Logger = new LoggerConfiguration()
 				.ReadFrom.Configuration(Configuration)
-				.CreateLogger();
+				.Enrich.FromLogContext()
+			.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+			{
+				AutoRegisterTemplate = true,
+			})
+			.CreateLogger();
 
 			try
 			{
